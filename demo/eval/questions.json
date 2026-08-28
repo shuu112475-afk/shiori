@@ -1,0 +1,353 @@
+{
+  "meta": {
+    "name": "Shiori 検索精度 評価質問セット",
+    "version": "1.0",
+    "created": "2026-08-26",
+    "total": 30,
+    "note": "すべて架空のデモ文書（demo/documents 配下）に対する評価用質問です。実在の組織とは関係ありません。",
+    "categories": {
+      "A": "単一文書で明確に答えられる質問（15問）",
+      "B": "表記ゆれ・言い換えを含む質問（8問）。ベクトル検索とキーワード検索のどちらが効くかの検証用",
+      "C": "複数文書をまたぐ質問（4問）",
+      "D": "答えられないべき質問（3問）。「分かりません」と答えるのが正解"
+    },
+    "field_notes": {
+      "expected_document": "根拠となる主たる文書。答えられないべき質問では null",
+      "expected_heading": "期待する heading_path の末尾部分（chunking.ts が生成する heading_path と後方一致する）",
+      "expected_answer_contains": "回答本文に含まれているべき文字列。すべて対応文書の本文に実在することを検証済み",
+      "supporting_documents": "カテゴリCのみ。主文書と併せて参照する必要がある文書",
+      "should_answer": "true なら回答すべき。false なら「該当する記載が見つかりませんでした」と返し unanswered に記録されるのが正解"
+    }
+  },
+  "questions": [
+    {
+      "id": "A-01",
+      "category": "A",
+      "question": "有給休暇の繰り越しは何日までできますか？",
+      "expected_document": "01_就業規則.md",
+      "expected_heading": "第4章 休暇 > 第22条 年次有給休暇",
+      "expected_answer_contains": ["2年", "40日"],
+      "should_answer": true,
+      "note": "デモの看板質問。条番号まで出典表示できることを見せる"
+    },
+    {
+      "id": "A-02",
+      "category": "A",
+      "question": "年次有給休暇は入社してからいつ、何日付与されますか？",
+      "expected_document": "01_就業規則.md",
+      "expected_heading": "第4章 休暇 > 第22条 年次有給休暇",
+      "expected_answer_contains": ["6か月", "8割", "10日"],
+      "should_answer": true,
+      "note": "同一チャンク内に付与日数の表があり、表を含むチャンクが引けるかの確認"
+    },
+    {
+      "id": "A-03",
+      "category": "A",
+      "question": "日勤の始業時刻と終業時刻、休憩時間を教えてください。",
+      "expected_document": "01_就業規則.md",
+      "expected_heading": "第3章 勤務時間、休憩および休日 > 第13条 始業および終業の時刻ならびに休憩時間",
+      "expected_answer_contains": ["午前8時30分", "午後5時30分", "60分"],
+      "should_answer": true,
+      "note": "第12条（所定労働時間）と紛らわしい。隣接条を取り違えないかの確認"
+    },
+    {
+      "id": "A-04",
+      "category": "A",
+      "question": "自己都合で退職する場合、何日前までに退職願を提出する必要がありますか？",
+      "expected_document": "01_就業規則.md",
+      "expected_heading": "第9章 退職および解雇 > 第50条 退職の手続",
+      "expected_answer_contains": ["30日前", "退職願"],
+      "should_answer": true,
+      "note": "第53条（解雇の予告）にも「30日前」があるため、条の取り違えが起きやすい"
+    },
+    {
+      "id": "A-05",
+      "category": "A",
+      "question": "懲戒処分にはどのような種類がありますか？",
+      "expected_document": "01_就業規則.md",
+      "expected_heading": "第8章 表彰および懲戒 > 第45条 懲戒の種類",
+      "expected_answer_contains": [
+        "けん責",
+        "減給",
+        "出勤停止",
+        "諭旨退職",
+        "懲戒解雇"
+      ],
+      "should_answer": true,
+      "note": "表形式の内容を列挙できるかの確認"
+    },
+    {
+      "id": "A-06",
+      "category": "A",
+      "question": "出張から戻ったあと、旅費の精算はいつまでに提出しますか？",
+      "expected_document": "02_旅費規程.md",
+      "expected_heading": "第4章 精算 > 第15条 精算期限",
+      "expected_answer_contains": ["10日以内", "旅費精算書"],
+      "should_answer": true,
+      "note": null
+    },
+    {
+      "id": "A-07",
+      "category": "A",
+      "question": "一般職員が大阪市に1泊で出張する場合、宿泊費の上限はいくらですか？",
+      "expected_document": "02_旅費規程.md",
+      "expected_heading": "第3章 旅費 > 第12条 宿泊費",
+      "expected_answer_contains": ["10,000円", "大阪市"],
+      "should_answer": true,
+      "note": "役職区分と地域区分の2軸の表を正しく読めるかの確認"
+    },
+    {
+      "id": "A-08",
+      "category": "A",
+      "question": "自家用車で出張したとき、走行距離あたりいくら支給されますか？",
+      "expected_document": "02_旅費規程.md",
+      "expected_heading": "第3章 旅費 > 第10条 自家用車の使用",
+      "expected_answer_contains": ["30円", "1キロメートル"],
+      "should_answer": true,
+      "note": null
+    },
+    {
+      "id": "A-09",
+      "category": "A",
+      "question": "育児休業は子が何歳になるまで取得できますか？",
+      "expected_document": "03_育児介護休業規程.md",
+      "expected_heading": "第2章 育児休業 > 第6条 育児休業の期間",
+      "expected_answer_contains": ["1歳", "1歳6か月", "2歳"],
+      "should_answer": true,
+      "note": null
+    },
+    {
+      "id": "A-10",
+      "category": "A",
+      "question": "介護休業は通算何日まで、何回に分けて取得できますか？",
+      "expected_document": "03_育児介護休業規程.md",
+      "expected_heading": "第3章 介護休業 > 第12条 介護休業の期間",
+      "expected_answer_contains": ["93日", "3回"],
+      "should_answer": true,
+      "note": null
+    },
+    {
+      "id": "A-11",
+      "category": "A",
+      "question": "手指衛生を行う5つのタイミングを教えてください。",
+      "expected_document": "04_感染対策マニュアル.md",
+      "expected_heading": "3. 手指衛生 > 3.1 手指衛生の5つのタイミング",
+      "expected_answer_contains": [
+        "患者に触れる前",
+        "清潔・無菌操作の前",
+        "患者に触れた後"
+      ],
+      "should_answer": true,
+      "note": "（1）〜（5）の列挙が親見出しのチャンクに保持されているかの確認"
+    },
+    {
+      "id": "A-12",
+      "category": "A",
+      "question": "個人防護具を外すときの順番を教えてください。",
+      "expected_document": "04_感染対策マニュアル.md",
+      "expected_heading": "4. 個人防護具(PPE) > 4.3 脱衣の手順",
+      "expected_answer_contains": ["手袋", "ゴーグル", "ガウン", "マスク"],
+      "should_answer": true,
+      "note": "4.2（着用の手順）と内容が酷似しており、逆順を返さないかの確認"
+    },
+    {
+      "id": "A-13",
+      "category": "A",
+      "question": "インシデントの影響度レベル3aとは、どのような場合ですか？",
+      "expected_document": "05_医療安全管理指針.md",
+      "expected_heading": "4. 患者影響度分類",
+      "expected_answer_contains": ["レベル3a", "簡単な処置や治療を要した"],
+      "should_answer": true,
+      "note": "レベル0〜5が1つの表に並ぶため、該当行だけを正しく引けるかの確認"
+    },
+    {
+      "id": "A-14",
+      "category": "A",
+      "question": "造影剤の副作用が発生した場合、報告書はいつまでにどこへ提出しますか？",
+      "expected_document": "06_放射線部門業務マニュアル.md",
+      "expected_heading": "5. 造影検査 > 5.3 副作用が発生した場合の初期対応",
+      "expected_answer_contains": [
+        "造影剤副作用報告書",
+        "24時間以内",
+        "医療安全管理室"
+      ],
+      "should_answer": true,
+      "note": "放射線科限定文書。放射線科ユーザーのみ回答が返ることをRLSデモで併せて確認する"
+    },
+    {
+      "id": "A-15",
+      "category": "A",
+      "question": "防護衣の点検はどのくらいの頻度で行いますか？",
+      "expected_document": "06_放射線部門業務マニュアル.md",
+      "expected_heading": "7. 防護具の管理 > 7.1 点検",
+      "expected_answer_contains": ["年1回"],
+      "should_answer": true,
+      "note": "「年1回」は他文書にも複数出現する。文書と見出しまで正しく特定できるかの確認"
+    },
+    {
+      "id": "B-01",
+      "category": "B",
+      "question": "有休っていつまで持ち越せる？",
+      "expected_document": "01_就業規則.md",
+      "expected_heading": "第4章 休暇 > 第22条 年次有給休暇",
+      "expected_answer_contains": ["2年", "40日"],
+      "should_answer": true,
+      "note": "A-01の口語版。文書は「年次有給休暇」「繰り越す」。「有休」「持ち越す」は本文に存在しないため、ベクトル検索側が効くはず"
+    },
+    {
+      "id": "B-02",
+      "category": "B",
+      "question": "産休ってどれくらい休めるんですか？",
+      "expected_document": "01_就業規則.md",
+      "expected_heading": "第4章 休暇 > 第25条 産前産後休業",
+      "expected_answer_contains": ["6週間", "8週間"],
+      "should_answer": true,
+      "note": "文書は「産前産後休業」。「産休」は3文字中2文字が一致するため pg_trgm も部分的に効く"
+    },
+    {
+      "id": "B-03",
+      "category": "B",
+      "question": "残業代の割増は何％ですか？",
+      "expected_document": "01_就業規則.md",
+      "expected_heading": "第5章 給与 > 第31条 割増賃金",
+      "expected_answer_contains": ["25パーセント", "35パーセント"],
+      "should_answer": true,
+      "note": "文書は「時間外労働」「パーセント」。「残業」「％」の表記ゆれ。回答は％表記に変換して返せるかも見る"
+    },
+    {
+      "id": "B-04",
+      "category": "B",
+      "question": "ボーナスはいつ支給されますか？",
+      "expected_document": "01_就業規則.md",
+      "expected_heading": "第5章 給与 > 第32条 昇給および賞与",
+      "expected_answer_contains": ["6月", "12月"],
+      "should_answer": true,
+      "note": "文書は「賞与」。「ボーナス」は本文に一切出現しないため、キーワード検索は完全に外れる"
+    },
+    {
+      "id": "B-05",
+      "category": "B",
+      "question": "出張費の前借りはできますか？",
+      "expected_document": "02_旅費規程.md",
+      "expected_heading": "第2章 出張の手続 > 第7条 仮払い",
+      "expected_answer_contains": ["仮払い", "3営業日前", "80パーセント"],
+      "should_answer": true,
+      "note": "文書は「仮払い」。「前借り」は本文に存在しない"
+    },
+    {
+      "id": "B-06",
+      "category": "B",
+      "question": "男性職員が子どもの生まれた直後に取れる休みは何日ありますか？",
+      "expected_document": "03_育児介護休業規程.md",
+      "expected_heading": "第2章 育児休業 > 第8条 出生時育児休業",
+      "expected_answer_contains": ["8週間", "4週間", "28日"],
+      "should_answer": true,
+      "note": "文書は「出生時育児休業（産後パパ育休）」。質問文には制度名が一切含まれない"
+    },
+    {
+      "id": "B-07",
+      "category": "B",
+      "question": "針刺しちゃったんですけど、どこに連絡すればいいですか？",
+      "expected_document": "04_感染対策マニュアル.md",
+      "expected_heading": "6. 針刺し・切創および血液体液曝露事故 > 6.3 報告フロー",
+      "expected_answer_contains": ["感染管理室", "内線2201", "30分以内"],
+      "should_answer": true,
+      "note": "口語かつ主語省略。連絡先まで含んだ表のチャンクを引けるかの確認"
+    },
+    {
+      "id": "B-08",
+      "category": "B",
+      "question": "レントゲン室で患者さんの本人確認はどうやりますか？",
+      "expected_document": "06_放射線部門業務マニュアル.md",
+      "expected_heading": "3. 患者確認 > 3.1 2点照合",
+      "expected_answer_contains": ["フルネーム", "生年月日", "2点照合"],
+      "should_answer": true,
+      "note": "文書は「一般撮影」「検査室」。「レントゲン」は本文に存在しない同義語"
+    },
+    {
+      "id": "C-01",
+      "category": "C",
+      "question": "産休・育休から復帰したあと、有給休暇はどうなりますか？",
+      "expected_document": "03_育児介護休業規程.md",
+      "expected_heading": "第7章 給与その他の取扱い > 第22条 年次有給休暇の取扱い",
+      "supporting_documents": ["01_就業規則.md"],
+      "expected_answer_contains": ["出勤したものとみなす", "40日"],
+      "should_answer": true,
+      "note": "出勤率の扱いは育児介護休業規程、繰越上限は就業規則第22条。2文書を統合しないと完答できない"
+    },
+    {
+      "id": "C-02",
+      "category": "C",
+      "question": "造影剤の副作用が起きたとき、放射線科の報告書のほかに医療安全へのインシデントレポートも必要ですか？",
+      "expected_document": "06_放射線部門業務マニュアル.md",
+      "expected_heading": "5. 造影検査 > 5.3 副作用が発生した場合の初期対応",
+      "supporting_documents": ["05_医療安全管理指針.md"],
+      "expected_answer_contains": [
+        "造影剤副作用報告書",
+        "レベル3b",
+        "24時間以内"
+      ],
+      "should_answer": true,
+      "note": "放射線部門マニュアルが医療安全管理指針を参照している。参照先の提出期限まで辿れるかの確認"
+    },
+    {
+      "id": "C-03",
+      "category": "C",
+      "question": "針刺し事故を起こした場合、労災の手続きはどこへいつまでに提出しますか？",
+      "expected_document": "04_感染対策マニュアル.md",
+      "expected_heading": "6. 針刺し・切創および血液体液曝露事故 > 6.3 報告フロー",
+      "supporting_documents": ["01_就業規則.md"],
+      "expected_answer_contains": [
+        "事務部人事課",
+        "7日以内",
+        "労働者災害補償保険"
+      ],
+      "should_answer": true,
+      "note": "期限と窓口は感染対策マニュアル、災害補償の根拠は就業規則第43条"
+    },
+    {
+      "id": "C-04",
+      "category": "C",
+      "question": "3歳の子どもを育てている職員は、1日の勤務時間が通常より何時間短くなりますか？",
+      "expected_document": "03_育児介護休業規程.md",
+      "expected_heading": "第6章 短時間勤務等 > 第18条 育児短時間勤務",
+      "supporting_documents": ["01_就業規則.md"],
+      "expected_answer_contains": ["6時間", "8時間"],
+      "should_answer": true,
+      "note": "短縮後は育児介護休業規程、通常の所定労働時間は就業規則第12条。差分を計算させる質問"
+    },
+    {
+      "id": "D-01",
+      "category": "D",
+      "question": "職員駐車場の月額利用料はいくらですか？",
+      "expected_document": null,
+      "expected_heading": null,
+      "expected_answer_contains": [],
+      "should_answer": false,
+      "expected_behavior": "「該当する記載が見つかりませんでした」と返し、unanswered に記録されること",
+      "note": "旅費規程に「駐車料金」の語があるため、ベクトル検索は近い文を拾ってくる。それでも答えを作らないかを見る最重要問"
+    },
+    {
+      "id": "D-02",
+      "category": "D",
+      "question": "職員食堂の営業時間を教えてください。",
+      "expected_document": null,
+      "expected_heading": null,
+      "expected_answer_contains": [],
+      "should_answer": false,
+      "expected_behavior": "「該当する記載が見つかりませんでした」と返し、unanswered に記録されること",
+      "note": "「営業時間」に近い時刻の記載（外来受付・当直体制など）が複数あり、引きずられやすい"
+    },
+    {
+      "id": "D-03",
+      "category": "D",
+      "question": "MRI装置の保守契約は、どの会社と結んでいますか？",
+      "expected_document": null,
+      "expected_heading": null,
+      "expected_answer_contains": [],
+      "should_answer": false,
+      "expected_behavior": "「該当する記載が見つかりませんでした」と返し、unanswered に記録されること",
+      "note": "放射線部門マニュアルに「保守業者へ連絡する」とあるが会社名の記載はない。もっともらしい捏造が起きやすい問"
+    }
+  ]
+}
