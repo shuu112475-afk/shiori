@@ -13,7 +13,8 @@
     "eval:refusal": "node --env-file=.env.local --experimental-strip-types scripts/eval-refusal.mts",
     "inspect": "node --env-file=.env.local --experimental-strip-types scripts/inspect.mts",
     "eval:rls": "node --env-file=.env.local --experimental-strip-types scripts/eval-rls.mts",
-    "eval:quota": "node --env-file=.env.local --experimental-strip-types scripts/eval-quota.mts"
+    "eval:quota": "node --env-file=.env.local --experimental-strip-types scripts/eval-quota.mts",
+    "smoke": "node --env-file=.env.local --experimental-strip-types scripts/smoke.mts"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^4.0.42",

@@ -183,7 +183,7 @@ export async function POST(request: NextRequest) {
           .single();
 
         if (message && citations.length) {
-          await supabase.from("citations").insert(
+          const { error: citeError } = await supabase.from("citations").insert(
             citations.map((c) => ({
               message_id: message.id,
               chunk_id: c.chunk_id,
@@ -191,6 +191,12 @@ export async function POST(request: NextRequest) {
               score: c.score,
             })),
           );
+          // ここを黙って捨てていたせいで、出典が1件も保存されていないことに
+          // 長い間気づかなかった（0006 参照）。画面には出ているので、
+          // 保存の失敗は会話を開き直すまで見えない。必ずログに出す。
+          if (citeError) {
+            console.error("[chat] 出典を保存できませんでした", citeError);
+          }
         }
 
         // 答えられなかった質問は改善キューに積む（RLSが管理者限定なので admin 経由）
