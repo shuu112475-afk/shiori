@@ -22,7 +22,8 @@ Supabase の **SQL Editor** で、次の順に実行します。
 | 3   | `supabase/migrations/0003_storage_policies.sql`    | Storage のRLS（**これが無いとアップロードが必ず失敗する**）                               |
 | 4   | `supabase/migrations/0004_lexical_threshold.sql`   | pg_trgm のしきい値を日本語向けに下げる（**これが無いとキーワード検索が1件も発火しない**） |
 | 5   | `supabase/migrations/0005_rate_limit.sql`          | 1日の質問回数の上限（**インターネットに公開するなら必須**。下の注記を読むこと）           |
-| 6   | `supabase/seed.sql`                                | 組織「さくら総合病院」とメンバーの所属                                                    |
+| 6   | `supabase/migrations/0006_citations_insert.sql`    | 出典の保存を許可する（**これが無いと出典が1件も保存されない**。下の注記）                 |
+| 7   | `supabase/seed.sql`                                | 組織「さくら総合病院」とメンバーの所属                                                    |
 
 `seed.sql` は先にメールアドレスを書き換えてから実行します（次項）。
 
@@ -38,6 +39,13 @@ Supabase の **SQL Editor** で、次の順に実行します。
 > パスワードは誰でも取り出せます。`/api/chat` は1回ごとに個人のAPIキーで
 > Haiku・Embedding・Sonnet を叩くので、上限が無いと請求が青天井になります。
 > 適用したら `npm run eval:quota` で効いていることを確かめてください。
+
+> **0006 を飛ばすと、画面では気づけない形で壊れます。**
+> 0001 は `citations` に `select` のポリシーしか作っていないため、
+> 出典の `insert` が RLS に弾かれます。出典はストリームで別途送っているので
+> **質問した直後の画面には出典が並び、正常に見えます**。
+> 壊れているのは会話を開き直したときで、根拠の無い回答だけが残ります。
+> 適用したら `npm run smoke` で、実際に行が増えることを確かめてください。
 
 ---
 
